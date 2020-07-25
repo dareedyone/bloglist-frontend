@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import login from "./services/login";
+import "./App.css";
+const Notification = ({ message }) => {
+	return message ? (
+		<div className={`message ${message.type}`}>{message.text}</div>
+	) : null;
+};
 
 const App = () => {
 	const [blogs, setBlogs] = useState([]);
@@ -9,6 +15,7 @@ const App = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [newBlog, setNewBlog] = useState({});
+	const [message, setMessage] = useState(null);
 
 	useEffect(() => {
 		blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -32,7 +39,11 @@ const App = () => {
 			setUsername("");
 			setPassword("");
 		} catch (exception) {
-			throw exception;
+			setMessage({ type: "error", text: "Wrong username or password !" });
+
+			setTimeout(() => {
+				setMessage(null);
+			}, 5000);
 		}
 	};
 
@@ -41,8 +52,22 @@ const App = () => {
 		try {
 			const newblog = await blogService.create(newBlog);
 			setBlogs(blogs.concat(newblog));
+			setMessage({
+				type: "success",
+				text: `A new blog - ${newBlog.title} by ${newBlog.author} added !`,
+			});
+			setTimeout(() => {
+				setMessage(null);
+			}, 5000);
 		} catch (exception) {
-			console.error(exception);
+			setMessage({
+				type: "error",
+				text: "oops!, something went wrong !.",
+			});
+
+			setTimeout(() => {
+				setMessage(null);
+			}, 5000);
 		}
 	};
 
@@ -61,6 +86,8 @@ const App = () => {
 	const loginForm = () => (
 		<div>
 			<h2>Log in to app</h2>
+
+			<Notification message={message} />
 
 			<form onSubmit={handleLogin}>
 				<div>
@@ -92,7 +119,9 @@ const App = () => {
 				loginForm()
 			) : (
 				<div>
-					<h2>blogs</h2>
+					<h2>Blogs</h2>
+
+					<Notification message={message} />
 
 					<h5>
 						{user.name} logged in{" "}
@@ -103,7 +132,7 @@ const App = () => {
 
 					<div>
 						<form onSubmit={addBlog}>
-							<h2>Blogs</h2>
+							<h2>Create new</h2>
 							<div>
 								Title:
 								<input name="title" type="text" onChange={handleChange} />
