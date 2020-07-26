@@ -3,6 +3,8 @@ import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import login from "./services/login";
 import "./App.css";
+import BlogForm from "./components/BlogForm";
+import Toggable from "./components/Toggable";
 const Notification = ({ message }) => {
 	return message ? (
 		<div className={`message ${message.type}`}>{message.text}</div>
@@ -14,7 +16,6 @@ const App = () => {
 	const [user, setUser] = useState(null);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const [newBlog, setNewBlog] = useState({});
 	const [message, setMessage] = useState(null);
 
 	useEffect(() => {
@@ -47,8 +48,7 @@ const App = () => {
 		}
 	};
 
-	const addBlog = async (event) => {
-		event.preventDefault();
+	const addBlog = async (newBlog) => {
 		try {
 			const newblog = await blogService.create(newBlog);
 			setBlogs(blogs.concat(newblog));
@@ -69,13 +69,6 @@ const App = () => {
 				setMessage(null);
 			}, 5000);
 		}
-	};
-
-	const handleChange = ({ target }) => {
-		setNewBlog((oldBlog) => ({
-			...oldBlog,
-			[target.name]: target.value,
-		}));
 	};
 
 	const handleLogout = () => {
@@ -113,6 +106,12 @@ const App = () => {
 		</div>
 	);
 
+	const blogForm = () => (
+		<Toggable buttonText="new note">
+			<BlogForm createBlog={addBlog} />
+		</Toggable>
+	);
+
 	return (
 		<div>
 			{!user ? (
@@ -130,24 +129,8 @@ const App = () => {
 						</button>
 					</h5>
 
-					<div>
-						<form onSubmit={addBlog}>
-							<h2>Create new</h2>
-							<div>
-								Title:
-								<input name="title" type="text" onChange={handleChange} />
-							</div>
-							<div>
-								Author:
-								<input name="author" type="text" onChange={handleChange} />
-							</div>
-							<div>
-								Url:
-								<input name="url" type="text" onChange={handleChange} />
-							</div>
-							<button>create</button>
-						</form>
-					</div>
+					{blogForm()}
+
 					{blogs.map((blog) => (
 						<Blog key={blog.id} blog={blog} />
 					))}
