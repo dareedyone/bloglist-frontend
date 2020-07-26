@@ -6,8 +6,8 @@ const setToken = (newToken) => {
 	token = `bearer ${newToken}`;
 };
 const getAll = () => {
-	const request = axios.get(baseUrl);
-	return request.then((response) => response.data);
+	const req = axios.get(baseUrl);
+	return req.then((response) => response.data);
 };
 
 const create = async (blog) => {
@@ -18,4 +18,9 @@ const create = async (blog) => {
 	return res.data;
 };
 
-export default { getAll, setToken, create };
+const edit = async (likes, blogId) => {
+	const res = await axios.put(baseUrl + "/" + blogId, { likes });
+	return res.data;
+};
+
+export default { getAll, setToken, create, edit };
