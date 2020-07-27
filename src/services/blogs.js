@@ -1,6 +1,9 @@
 import axios from "axios";
+
 const baseUrl = "/api/blogs";
-let token = null;
+let token =
+	null ||
+	`bearer ${JSON.parse(window.localStorage.getItem("loggedUser")).token}`;
 
 const setToken = (newToken) => {
 	token = `bearer ${newToken}`;
@@ -23,4 +26,12 @@ const edit = async (likes, blogId) => {
 	return res.data;
 };
 
-export default { getAll, setToken, create, edit };
+const destroy = async (blogId) => {
+	const config = {
+		headers: { Authorization: token },
+	};
+	const res = await axios.delete(baseUrl + "/" + blogId, config);
+	return res.data;
+};
+
+export default { getAll, setToken, create, edit, destroy };

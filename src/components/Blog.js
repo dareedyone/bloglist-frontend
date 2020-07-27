@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog: propsBlog }) => {
+const Blog = ({ blog: propsBlog, handleDelete, username }) => {
 	const [view, setView] = useState(false);
 	const [blog, setblog] = useState(propsBlog);
 	const blogStyle = {
@@ -16,6 +16,10 @@ const Blog = ({ blog: propsBlog }) => {
 		setblog({ ...blog, likes: editedBlog.likes });
 	};
 
+	const deleteBlog = () => {
+		handleDelete(blog);
+	};
+	console.log(blog?.user?.username, username);
 	return (
 		<div style={blogStyle}>
 			<p>
@@ -34,6 +38,11 @@ const Blog = ({ blog: propsBlog }) => {
 						</button>
 					</p>
 					<p>{blog.user?.username}</p>
+					{username === blog?.user?.username && (
+						<button onClick={deleteBlog} style={{ backgroundColor: "blue" }}>
+							Delete
+						</button>
+					)}
 				</>
 			)}
 		</div>

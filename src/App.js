@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import login from "./services/login";
 import "./App.css";
 import BlogForm from "./components/BlogForm";
 import Toggable from "./components/Toggable";
+
 const Notification = ({ message }) => {
 	return message ? (
 		<div className={`message ${message.type}`}>{message.text}</div>
@@ -18,8 +19,12 @@ const App = () => {
 	const [password, setPassword] = useState("");
 	const [message, setMessage] = useState(null);
 
+	const blogFormToggableRef = useRef();
+
 	useEffect(() => {
-		blogService.getAll().then((blogs) => setBlogs(blogs));
+		blogService
+			.getAll()
+			.then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
 	}, []);
 
 	useEffect(() => {
@@ -29,6 +34,23 @@ const App = () => {
 			setUser(user);
 		}
 	}, []);
+
+	const handleDelete = async (blog) => {
+		const confirm = window.confirm(
+			`Remove Blog ${blog.title} by ${blog.author}`
+		);
+		if (!confirm) return;
+		try {
+			await blogService.destroy(blog.id);
+			setBlogs(blogs.filter((b) => b.id !== blog.id));
+		} catch (exception) {
+			setMessage({ type: "error", text: "You are not authorized !" });
+
+			setTimeout(() => {
+				setMessage(null);
+			}, 5000);
+		}
+	};
 
 	const handleLogin = async (event) => {
 		event.preventDefault();
@@ -52,6 +74,7 @@ const App = () => {
 		try {
 			const newblog = await blogService.create(newBlog);
 			setBlogs(blogs.concat(newblog));
+
 			setMessage({
 				type: "success",
 				text: `A new blog - ${newBlog.title} by ${newBlog.author} added !`,
@@ -59,6 +82,7 @@ const App = () => {
 			setTimeout(() => {
 				setMessage(null);
 			}, 5000);
+			blogFormToggableRef.current.toggleVisibility();
 		} catch (exception) {
 			setMessage({
 				type: "error",
@@ -107,7 +131,7 @@ const App = () => {
 	);
 
 	const blogForm = () => (
-		<Toggable buttonText="new note">
+		<Toggable ref={blogFormToggableRef} buttonText="new note">
 			<BlogForm createBlog={addBlog} />
 		</Toggable>
 	);
@@ -132,7 +156,12 @@ const App = () => {
 					{blogForm()}
 
 					{blogs.map((blog) => (
-						<Blog key={blog.id} blog={blog} />
+						<Blog
+							key={blog.id}
+							blog={blog}
+							handleDelete={handleDelete}
+							username={user.username}
+						/>
 					))}
 				</div>
 			)}
