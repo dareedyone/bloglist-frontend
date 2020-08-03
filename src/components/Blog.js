@@ -14,26 +14,27 @@ const Blog = ({ blog: propsBlog, handleDelete, username }) => {
 	const handleEdit = async () => {
 		const editedBlog = await blogService.edit(blog.likes + 1, blog.id);
 		setblog({ ...blog, likes: editedBlog.likes });
+		console.log("i logged");
 	};
 
 	const deleteBlog = () => {
 		handleDelete(blog);
 	};
-	console.log(blog?.user?.username, username);
+	// console.log(blog?.user?.username, username);
 	return (
 		<div style={blogStyle}>
-			<p>
+			<p className="title-author">
 				{blog.title} {blog.author}
 				<button onClick={() => setView(!view)}>
 					<small>{view ? "hide" : "view"}</small>
 				</button>
 			</p>
 			{view && (
-				<>
+				<div className="url-likes">
 					<p>{blog.url}</p>
 					<p>
 						likes {blog.likes}{" "}
-						<button onClick={handleEdit}>
+						<button className="like_btn" onClick={handleEdit}>
 							<small>like</small>
 						</button>
 					</p>
@@ -43,7 +44,7 @@ const Blog = ({ blog: propsBlog, handleDelete, username }) => {
 							Delete
 						</button>
 					)}
-				</>
+				</div>
 			)}
 		</div>
 	);
