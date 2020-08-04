@@ -2,6 +2,7 @@ describe("Blog app", function () {
 	beforeEach(function () {
 		cy.request("POST", "http://localhost:3001/api/testing/reset");
 		cy.request("POST", "http://localhost:3001/api/users", {
+			name: "Big Man",
 			username: "strayen",
 			password: "test1234",
 		});
@@ -25,7 +26,7 @@ describe("Blog app", function () {
 			cy.get("input[name='username']").type("strayen");
 			cy.get("input[name='password']").type("test1234");
 			cy.contains("login").click();
-			cy.contains("logged in");
+			cy.contains("Big Man logged in");
 		});
 
 		it("fails with wrong credentials", function () {
@@ -38,7 +39,7 @@ describe("Blog app", function () {
 		});
 	});
 
-	describe.only("When looged in", function () {
+	describe("When looged in", function () {
 		beforeEach(function () {
 			cy.get("input[name='username']").type("strayen");
 			cy.get("input[name='password']").type("test1234");
@@ -54,7 +55,7 @@ describe("Blog app", function () {
 			cy.contains("A new blog - A cypress title by Tester Man added !");
 		});
 
-		describe.only("When there is a blog", function () {
+		describe("When there is a blog", function () {
 			beforeEach(function () {
 				cy.contains("new note").click();
 				cy.get("input[name='title']").type("A cypress title");
@@ -62,6 +63,18 @@ describe("Blog app", function () {
 				cy.get("input[name='url']").type("example.com");
 				cy.contains("create").click();
 				cy.contains("A new blog - A cypress title by Tester Man added !");
+
+				cy.visit("http://localhost:3000");
+
+				// cy.request({
+				// 	url: "http://localhost:3001/api/blogs",
+				// 	method: "POST",
+				// 	body: {
+				// 		title: "A cypress title",
+				// 		author: "Tester Man",
+				// 		url: "example.com",
+				// 	},
+				// });
 			});
 
 			it("user can like a blog.", function () {
@@ -71,6 +84,14 @@ describe("Blog app", function () {
 					.find(".like_btn")
 					.click();
 				cy.contains("A cypress title Tester Man").parent().contains("likes 1");
+			});
+			it("a user who created a blog can delete it", function () {
+				cy.contains("A cypress title Tester Man").find("button").click();
+				cy.contains("A cypress title Tester Man")
+					.parent()
+					.contains("Delete")
+					.click();
+				cy.get("html").should("not.contain", "A cypress title Tester Man");
 			});
 		});
 	});
