@@ -7,10 +7,6 @@ describe("Blog app", function () {
 			password: "test1234",
 		});
 
-		// .then((res) => {
-		//     localStorage.setItem("loggedUser", JSON.stringify(res.body));
-
-		// });
 		cy.visit("http://localhost:3000");
 	});
 
@@ -65,16 +61,6 @@ describe("Blog app", function () {
 				cy.contains("A new blog - A cypress title by Tester Man added !");
 
 				cy.visit("http://localhost:3000");
-
-				// cy.request({
-				// 	url: "http://localhost:3001/api/blogs",
-				// 	method: "POST",
-				// 	body: {
-				// 		title: "A cypress title",
-				// 		author: "Tester Man",
-				// 		url: "example.com",
-				// 	},
-				// });
 			});
 
 			it("user can like a blog.", function () {
@@ -92,6 +78,50 @@ describe("Blog app", function () {
 					.contains("Delete")
 					.click();
 				cy.get("html").should("not.contain", "A cypress title Tester Man");
+			});
+
+			it(" blogs are ordered according to likes with the blog with the most likes being first", function () {
+				cy.request({
+					url: "http://localhost:3001/api/blogs",
+					method: "POST",
+					body: {
+						title: "Another cypress title",
+						author: "Tester Man",
+						url: "example.com",
+						likes: 3,
+					},
+					headers: {
+						Authorization: `bearer ${
+							JSON.parse(localStorage.getItem("loggedUser")).token
+						}`,
+					},
+				}).then(() => {
+					cy.request({
+						url: "http://localhost:3001/api/blogs",
+						method: "POST",
+						body: {
+							title: "Last cypress title",
+							author: "Tester Man",
+							url: "example.com",
+							likes: 1,
+						},
+						headers: {
+							Authorization: `bearer ${
+								JSON.parse(localStorage.getItem("loggedUser")).token
+							}`,
+						},
+					}).then(() => {
+						cy.visit("http://localhost:3000");
+						cy.get(".view_btn").then((viewBtn) => {
+							for (let i = 0; i < viewBtn.length; i++) {
+								cy.wrap(viewBtn[i]).click();
+							}
+						});
+						cy.get(".num_of_like").should(($like) => {
+							expect($like.get(0).innerText).to.eq("3");
+						});
+					});
+				});
 			});
 		});
 	});

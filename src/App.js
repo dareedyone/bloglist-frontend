@@ -73,7 +73,6 @@ const App = () => {
 	const addBlog = async (newBlog) => {
 		try {
 			const newblog = await blogService.create(newBlog);
-			console.log(newBlog);
 
 			setBlogs(blogs.concat(newblog));
 

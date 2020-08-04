@@ -25,7 +25,7 @@ const Blog = ({ blog: propsBlog, handleDelete, username }) => {
 		<div style={blogStyle}>
 			<p className="title-author">
 				{blog.title} {blog.author}
-				<button onClick={() => setView(!view)}>
+				<button className="view_btn" onClick={() => setView(!view)}>
 					<small>{view ? "hide" : "view"}</small>
 				</button>
 			</p>
@@ -33,7 +33,7 @@ const Blog = ({ blog: propsBlog, handleDelete, username }) => {
 				<div className="url-likes">
 					<p>{blog.url}</p>
 					<p>
-						likes {blog.likes}{" "}
+						likes <span className="num_of_like">{blog.likes}</span>
 						<button className="like_btn" onClick={handleEdit}>
 							<small>like</small>
 						</button>
