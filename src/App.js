@@ -5,6 +5,8 @@ import login from "./services/login";
 import "./App.css";
 import BlogForm from "./components/BlogForm";
 import Toggable from "./components/Toggable";
+import { setNotification } from "./reducers/notificationReducer";
+import { useSelector, useDispatch } from "react-redux";
 
 const Notification = ({ message }) => {
 	return message ? (
@@ -17,8 +19,8 @@ const App = () => {
 	const [user, setUser] = useState(null);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const [message, setMessage] = useState(null);
-
+	const message = useSelector((state) => state);
+	const dispatch = useDispatch();
 	const blogFormToggableRef = useRef();
 
 	useEffect(() => {
@@ -44,10 +46,12 @@ const App = () => {
 			await blogService.destroy(blog.id);
 			setBlogs(blogs.filter((b) => b.id !== blog.id));
 		} catch (exception) {
-			setMessage({ type: "error", text: "You are not authorized !" });
+			dispatch(
+				setNotification({ type: "error", text: "You are not authorized !" })
+			);
 
 			setTimeout(() => {
-				setMessage(null);
+				dispatch(setNotification(null));
 			}, 5000);
 		}
 	};
@@ -62,10 +66,12 @@ const App = () => {
 			setUsername("");
 			setPassword("");
 		} catch (exception) {
-			setMessage({ type: "error", text: "Wrong username or password !" });
+			dispatch(
+				setNotification({ type: "error", text: "Wrong username or password !" })
+			);
 
 			setTimeout(() => {
-				setMessage(null);
+				dispatch(setNotification(null));
 			}, 5000);
 		}
 	};
@@ -75,23 +81,27 @@ const App = () => {
 			const newblog = await blogService.create(newBlog);
 
 			setBlogs(blogs.concat(newblog));
+			dispatch(
+				setNotification({
+					type: "success",
+					text: `A new blog - ${newBlog.title} by ${newBlog.author} added !`,
+				})
+			);
 
-			setMessage({
-				type: "success",
-				text: `A new blog - ${newBlog.title} by ${newBlog.author} added !`,
-			});
 			setTimeout(() => {
-				setMessage(null);
+				dispatch(setNotification(null));
 			}, 5000);
 			blogFormToggableRef.current.toggleVisibility();
 		} catch (exception) {
-			setMessage({
-				type: "error",
-				text: "oops!, something went wrong !.",
-			});
+			dispatch(
+				setNotification({
+					type: "error",
+					text: "oops!, something went wrong !.",
+				})
+			);
 
 			setTimeout(() => {
-				setMessage(null);
+				dispatch(setNotification(null));
 			}, 5000);
 		}
 	};
