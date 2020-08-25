@@ -7,6 +7,11 @@ import BlogForm from "./components/BlogForm";
 import Toggable from "./components/Toggable";
 import { setNotification } from "./reducers/notificationReducer";
 import { useSelector, useDispatch } from "react-redux";
+import {
+	initializeBlogs,
+	createBlog,
+	deleteBlog,
+} from "./reducers/blogReducer";
 
 const Notification = ({ message }) => {
 	return message ? (
@@ -15,19 +20,19 @@ const Notification = ({ message }) => {
 };
 
 const App = () => {
-	const [blogs, setBlogs] = useState([]);
 	const [user, setUser] = useState(null);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const message = useSelector((state) => state);
+	const message = useSelector((state) => state.notification);
+	const blogs = useSelector((state) =>
+		state.blogs.sort((a, b) => b.likes - a.likes)
+	);
 	const dispatch = useDispatch();
 	const blogFormToggableRef = useRef();
 
 	useEffect(() => {
-		blogService
-			.getAll()
-			.then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
-	}, []);
+		dispatch(initializeBlogs());
+	}, [dispatch]);
 
 	useEffect(() => {
 		const loggedUser = window.localStorage.getItem("loggedUser");
@@ -37,23 +42,12 @@ const App = () => {
 		}
 	}, []);
 
-	const handleDelete = async (blog) => {
+	const handleDelete = (blog) => {
 		const confirm = window.confirm(
 			`Remove Blog ${blog.title} by ${blog.author}`
 		);
 		if (!confirm) return;
-		try {
-			await blogService.destroy(blog.id);
-			setBlogs(blogs.filter((b) => b.id !== blog.id));
-		} catch (exception) {
-			dispatch(
-				setNotification({ type: "error", text: "You are not authorized !" })
-			);
-
-			setTimeout(() => {
-				dispatch(setNotification(null));
-			}, 5000);
-		}
+		dispatch(deleteBlog(blog.id));
 	};
 
 	const handleLogin = async (event) => {
@@ -77,33 +71,7 @@ const App = () => {
 	};
 
 	const addBlog = async (newBlog) => {
-		try {
-			const newblog = await blogService.create(newBlog);
-
-			setBlogs(blogs.concat(newblog));
-			dispatch(
-				setNotification({
-					type: "success",
-					text: `A new blog - ${newBlog.title} by ${newBlog.author} added !`,
-				})
-			);
-
-			setTimeout(() => {
-				dispatch(setNotification(null));
-			}, 5000);
-			blogFormToggableRef.current.toggleVisibility();
-		} catch (exception) {
-			dispatch(
-				setNotification({
-					type: "error",
-					text: "oops!, something went wrong !.",
-				})
-			);
-
-			setTimeout(() => {
-				dispatch(setNotification(null));
-			}, 5000);
-		}
+		dispatch(createBlog(newBlog));
 	};
 
 	const handleLogout = () => {
