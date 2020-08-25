@@ -8,6 +8,11 @@ const blogReducer = (state = [], action) => {
 			return [...state, action.payload];
 		case "REMOVE_BLOG":
 			return state.filter((b) => b.id !== action.payload);
+		case "ADD_LIKE":
+			return state.map((blog) =>
+				blog.id === action.payload ? { ...blog, likes: blog.likes + 1 } : blog
+			);
+
 		default:
 			return state;
 	}
@@ -74,6 +79,16 @@ export const createBlog = (blog) => {
 				dispatch(setNotification(null));
 			}, 5000);
 		}
+	};
+};
+
+export const addLike = (blog) => {
+	return async (dispatch) => {
+		await blogService.edit(blog.likes + 1, blog.id);
+		dispatch({
+			type: "ADD_LIKE",
+			payload: blog.id,
+		});
 	};
 };
 

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import blogService from "../services/blogs";
+import { useDispatch } from "react-redux";
+import { addLike } from "../reducers/blogReducer";
 
-const Blog = ({ blog: propsBlog, handleDelete, username }) => {
+const Blog = ({ blog, handleDelete, username }) => {
 	const [view, setView] = useState(false);
-	const [blog, setblog] = useState(propsBlog);
+	const dispatch = useDispatch();
 	const blogStyle = {
 		paddingTop: 10,
 		paddingLeft: 10,
@@ -11,16 +12,13 @@ const Blog = ({ blog: propsBlog, handleDelete, username }) => {
 		borderWidth: 1,
 		marginBottom: 5,
 	};
-	const handleEdit = async () => {
-		const editedBlog = await blogService.edit(blog.likes + 1, blog.id);
-		setblog({ ...blog, likes: editedBlog.likes });
-		console.log("i logged");
+	const handleLike = () => {
+		dispatch(addLike(blog));
 	};
 
 	const deleteBlog = () => {
 		handleDelete(blog);
 	};
-	// console.log(blog?.user?.username, username);
 	return (
 		<div style={blogStyle}>
 			<p className="title-author">
@@ -34,7 +32,7 @@ const Blog = ({ blog: propsBlog, handleDelete, username }) => {
 					<p>{blog.url}</p>
 					<p>
 						likes <span className="num_of_like">{blog.likes}</span>
-						<button className="like_btn" onClick={handleEdit}>
+						<button className="like_btn" onClick={handleLike}>
 							<small>like</small>
 						</button>
 					</p>
