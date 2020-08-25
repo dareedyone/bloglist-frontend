@@ -5,6 +5,7 @@ import { addLike } from "../reducers/blogReducer";
 const Blog = ({ blog, handleDelete, username }) => {
 	const [view, setView] = useState(false);
 	const dispatch = useDispatch();
+
 	const blogStyle = {
 		paddingTop: 10,
 		paddingLeft: 10,
