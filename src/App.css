@@ -63,3 +63,12 @@ h2 {
 .success {
 	color: green;
 }
+
+.home_nav {
+	display: flex;
+	background-color: rgb(150, 144, 144);
+}
+.home_nav li {
+	padding: 5px;
+	list-style: none;
+}

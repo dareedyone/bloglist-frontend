@@ -101,12 +101,20 @@ const App = () => {
 
 					<Notification message={message} />
 
-					<h5>
-						{user.name} logged in{" "}
-						<button onClick={handleLogout}>
-							<small>logout</small>{" "}
-						</button>
-					</h5>
+					<ul className="home_nav">
+						<li>
+							<Link to="/blogs">blogs</Link>
+						</li>
+						<li>
+							<Link to="/users">users</Link>
+						</li>
+						<li>{user.name} logged in </li>
+						<li>
+							<button onClick={handleLogout}>
+								<small>logout</small>{" "}
+							</button>
+						</li>
+					</ul>
 					<Switch>
 						<Route exact path="/users">
 							<UserPage users={users} />
