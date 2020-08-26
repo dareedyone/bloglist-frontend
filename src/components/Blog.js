@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { addLike } from "../reducers/blogReducer";
+// import { useDispatch } from "react-redux";
+// import { addLike } from "../reducers/blogReducer";
+import { Link } from "react-router-dom";
 
 const Blog = ({ blog, handleDelete, username }) => {
 	const [view, setView] = useState(false);
-	const dispatch = useDispatch();
+	// const dispatch = useDispatch();
 
 	const blogStyle = {
 		paddingTop: 10,
@@ -13,22 +14,24 @@ const Blog = ({ blog, handleDelete, username }) => {
 		borderWidth: 1,
 		marginBottom: 5,
 	};
-	const handleLike = () => {
-		dispatch(addLike(blog));
-	};
+	// const handleLike = () => {
+	// 	dispatch(addLike(blog));
+	// };
 
-	const deleteBlog = () => {
-		handleDelete(blog);
-	};
+	// const deleteBlog = () => {
+	// 	handleDelete(blog);
+	// };
 	return (
 		<div style={blogStyle}>
 			<p className="title-author">
-				{blog.title} {blog.author}
+				<Link to={`/blogs/${blog.id}`}>
+					{blog.title} - {blog.author}
+				</Link>
 				<button className="view_btn" onClick={() => setView(!view)}>
 					<small>{view ? "hide" : "view"}</small>
 				</button>
 			</p>
-			{view && (
+			{/* {view && (
 				<div className="url-likes">
 					<p>{blog.url}</p>
 					<p>
@@ -44,7 +47,7 @@ const Blog = ({ blog, handleDelete, username }) => {
 						</button>
 					)}
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 };
