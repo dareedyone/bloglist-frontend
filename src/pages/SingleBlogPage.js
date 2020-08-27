@@ -23,6 +23,13 @@ const SingleBlogPage = ({ blog }) => {
 				{blog.likes} likes <button onClick={handleLike}>like</button>
 			</p>
 			<p> added by {blog.user.name}</p>
+
+			<h4>comments</h4>
+			<ul>
+				{blog.comments.map((c, i) => (
+					<li key={i}>{c}</li>
+				))}
+			</ul>
 		</div>
 	);
 };
