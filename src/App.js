@@ -8,10 +8,35 @@ import { Route, Switch, Link, useRouteMatch } from "react-router-dom";
 import UserBlogPage from "./pages/UserBlogPage";
 import { initializeUsers } from "./reducers/usersReducer";
 import SingleBlogPage from "./pages/SingleBlogPage";
+import Container from "@material-ui/core/Container";
+import {
+	AppBar,
+	Toolbar,
+	Typography,
+	Button,
+	makeStyles,
+	TextField,
+} from "@material-ui/core";
+import Alert from "@material-ui/lab/Alert";
+const useStyles = makeStyles((theme) => ({
+	root: {
+		flexGrow: 1,
+	},
+	menuButton: {
+		marginRight: theme.spacing(2),
+	},
+	title: {
+		marginRight: theme.spacing(6),
+		textDecoration: "none",
+		color: "inherit",
+	},
+}));
 
 const Notification = ({ message }) => {
 	return message ? (
-		<div className={`message ${message.type}`}>{message.text}</div>
+		<Alert style={{ marginBottom: "15px" }} severity={`${message.type}`}>
+			{message.text}
+		</Alert>
 	) : null;
 };
 
@@ -34,6 +59,7 @@ const App = () => {
 	const userWithBlogs = userMatch
 		? users.find((user) => user.id === userMatch.params.id)
 		: null;
+	const classes = useStyles();
 
 	useEffect(() => {
 		dispatch(initializeUsers());
@@ -62,75 +88,85 @@ const App = () => {
 	};
 
 	const loginForm = () => (
-		<div>
+		<Container>
 			<h2>Log in to app</h2>
 
 			<Notification message={message} />
 
 			<form onSubmit={handleLogin}>
-				<div>
-					username
-					<input
-						type="text"
-						name="username"
-						onChange={({ target }) => setUsername(target.value)}
-					/>
-				</div>
+				<TextField
+					style={{ marginBottom: "15px" }}
+					type="text"
+					name="username"
+					onChange={({ target }) => setUsername(target.value)}
+					id="outlined-basic"
+					label="username"
+					variant="outlined"
+				/>
 
-				<div>
-					password
-					<input
-						type="password"
-						name="password"
-						autoComplete="off"
-						onChange={({ target }) => setPassword(target.value)}
-					/>
-				</div>
-				<button>login</button>
+				<br />
+				<TextField
+					style={{ marginBottom: "15px" }}
+					type="password"
+					name="password"
+					autoComplete="off"
+					onChange={({ target }) => setPassword(target.value)}
+					label="password"
+					variant="outlined"
+				/>
+				<br />
+				<Button type="submit" variant="contained" color="primary">
+					Login
+				</Button>
 			</form>
-		</div>
+		</Container>
 	);
 
 	return (
 		<div>
-			{!user ? (
-				loginForm()
-			) : (
-				<div>
-					<h2>Blogs</h2>
+			<AppBar position="static">
+				<Toolbar>
+					<Link className={classes.title} to="/blogs">
+						<Typography variant="h6">Blogs</Typography>
+					</Link>
 
-					<Notification message={message} />
+					<Link className={classes.title} to="/users">
+						<Typography variant="h6">Users</Typography>
+					</Link>
 
-					<ul className="home_nav">
-						<li>
-							<Link to="/blogs">blogs</Link>
-						</li>
-						<li>
-							<Link to="/users">users</Link>
-						</li>
-						<li>{user.name} logged in </li>
-						<li>
-							<button onClick={handleLogout}>
-								<small>logout</small>{" "}
-							</button>
-						</li>
-					</ul>
-					<Switch>
-						<Route exact path="/users">
-							<UserPage users={users} />
-						</Route>
-						<Route path="/users/:id">
-							<UserBlogPage user={userWithBlogs} />
-						</Route>
-						<Route path="/blogs/:id">
-							<SingleBlogPage blog={routedBlog} />
-						</Route>
-						<Route path="/">
-							<BlogPage user={user} />
-						</Route>
-					</Switch>
-				</div>
-			)}
+					{user && (
+						<Button onClick={handleLogout} color="inherit">
+							Logout
+						</Button>
+					)}
+				</Toolbar>
+			</AppBar>
+			<Container maxWidth={false}>
+				{!user ? (
+					loginForm()
+				) : (
+					<div>
+						<h2>Blogs</h2>
+
+						<Notification message={message} />
+
+						<Switch>
+							<Route exact path="/users">
+								<UserPage users={users} />
+							</Route>
+							<Route path="/users/:id">
+								<UserBlogPage user={userWithBlogs} />
+							</Route>
+							<Route path="/blogs/:id">
+								<SingleBlogPage blog={routedBlog} />
+							</Route>
+							<Route path="/">
+								<BlogPage user={user} />
+							</Route>
+						</Switch>
+					</div>
+				)}
+			</Container>
 		</div>
 	);
 };
