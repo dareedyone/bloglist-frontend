@@ -34,4 +34,11 @@ const destroy = async (blogId) => {
 	return res.data;
 };
 
-export default { getAll, setToken, create, edit, destroy };
+const comment = async (comment, blogId) => {
+	const commentedBlog = await axios.post(`${baseUrl}/${blogId}/comments`, {
+		comment,
+	});
+	return commentedBlog.data;
+};
+
+export default { getAll, setToken, create, edit, destroy, comment };

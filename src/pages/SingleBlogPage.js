@@ -1,9 +1,10 @@
 import React from "react";
-import { useEffect } from "react";
-import { initializeBlogs, addLike } from "../reducers/blogReducer";
+import { useEffect, useState } from "react";
+import { initializeBlogs, addLike, addComment } from "../reducers/blogReducer";
 import { useDispatch } from "react-redux";
 
 const SingleBlogPage = ({ blog }) => {
+	const [comment, setComment] = useState("");
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch(initializeBlogs());
@@ -15,6 +16,14 @@ const SingleBlogPage = ({ blog }) => {
 	const handleLike = () => {
 		dispatch(addLike(blog));
 	};
+	const handleChange = (e) => {
+		setComment(e.target.value);
+	};
+
+	const handleComment = () => {
+		dispatch(addComment(comment, blog.id));
+		setComment("");
+	};
 	return (
 		<div>
 			<h3>{blog.title}</h3>
@@ -25,6 +34,10 @@ const SingleBlogPage = ({ blog }) => {
 			<p> added by {blog.user.name}</p>
 
 			<h4>comments</h4>
+			<div>
+				<input value={comment} type="text" onChange={handleChange} />{" "}
+				<button onClick={handleComment}>comment</button>
+			</div>
 			<ul>
 				{blog.comments.map((c, i) => (
 					<li key={i}>{c}</li>

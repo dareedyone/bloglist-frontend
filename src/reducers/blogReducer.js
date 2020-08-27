@@ -12,6 +12,10 @@ const blogReducer = (state = [], action) => {
 			return state.map((blog) =>
 				blog.id === action.payload ? { ...blog, likes: blog.likes + 1 } : blog
 			);
+		case "ADD_COMMENT":
+			return state.map((blog) =>
+				blog.id === action.payload.id ? action.payload : blog
+			);
 
 		default:
 			return state;
@@ -92,4 +96,13 @@ export const addLike = (blog) => {
 	};
 };
 
+export const addComment = (comment, blogId) => {
+	return async (dispatch) => {
+		const commentedBlog = await blogService.comment(comment, blogId);
+		dispatch({
+			type: "ADD_COMMENT",
+			payload: commentedBlog,
+		});
+	};
+};
 export default blogReducer;
